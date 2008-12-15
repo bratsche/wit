@@ -36,6 +36,24 @@ namespace wit
 				uint nselected = Helpers.DragQueryFile(m_hDrop, 0xffffffff, null, 0);
 				if (nselected == 1)
 				{
+                    if (menu_items == null)
+                        menu_items = new List<MenuItem>();
+
+                    StringBuilder sb = new StringBuilder(1024);
+                    Helpers.DragQueryFile(m_hDrop, 0, sb, sb.Capacity + 1);
+                    string filename = sb.ToString();
+
+                    Directory.SetCurrentDirectory(filename);
+
+                    // Setup our menu items
+                    int status = RunProcess(@"C:\Program Files\Git\bin\git", "rev-parse --cdup");
+                    if (status < 0)
+                        menu_items.Add(new MenuItem("Cannot find git"));
+                    else if (status > 0)
+                        menu_items.Add(new MenuItem("Init Git Repo"));
+                    else if (status == 0)
+                        menu_items.Add(new MenuItem("Git Actions"));
+
                     /*
                     uint hmnuPopup = Helpers.CreatePopupMenu();
                     id = PopulateMenu(hmnuPopup, idCmdFirst + id);
@@ -165,22 +183,6 @@ namespace wit
 					STGMEDIUM medium = new STGMEDIUM();
 					m_dataObject.GetData(ref fmt, ref medium);
 					m_hDrop = medium.hGlobal;
-
-                    StringBuilder sb = new StringBuilder();
-                    Helpers.SHGetPathFromIDList(pidlFolder, sb);
-                    string path = sb.ToString();
-
-                    if (menu_items == null)
-                        menu_items = new List<MenuItem>();
-
-                    // Setup our menu items
-                    int status = RunProcess(@"C:\Program Files\Git\bin\git", "rev-parse --cdup");
-                    if (status < 0)
-                        menu_items.Add(new MenuItem("Cannot find git"));
-                    else if (status > 0)
-                        menu_items.Add(new MenuItem("Init Git Repo"));
-                    else if (status == 0)
-                        menu_items.Add(new MenuItem("Git Actions"));
 				}
 			}
 			catch(Exception)
