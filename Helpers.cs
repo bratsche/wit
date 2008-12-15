@@ -8,7 +8,13 @@ namespace wit
 	{
 #region Win32 Imports
 		[DllImport("kernel32.dll")]
-		internal static extern Boolean SetCurrentDirectory([MarshalAs(UnmanagedType.LPTStr)]string lpPathName);
+		internal static extern bool SetCurrentDirectory([MarshalAs(UnmanagedType.LPTStr)]string lpPathName);
+
+        //[DllImport("shell32.dll")]
+        //internal static extern bool SHGetPathFromIDList(IntPtr /*PCIDLIST_ABSOLUTE*/ pidl, [MarshalAs(UnmanagedType.LPStr)]string pszPath);
+
+        [DllImport("shell32.dll")]
+        internal static extern bool SHGetPathFromIDList(IntPtr pidl, StringBuilder path);
 
 		[DllImport("kernel32.dll")]
 		internal static extern uint GetFileAttributes([MarshalAs(UnmanagedType.LPTStr)]string lpPathName);
@@ -37,7 +43,7 @@ namespace wit
 		internal static extern int MessageBox(int hWnd, string text, string caption, int type);
 
 		[DllImport("user32")]
-		internal static extern int InsertMenuItem(uint hmenu, uint uposition, uint uflags, ref MENUITEMINFO mii);
+		internal static extern int InsertMenuItem(uint hmenu, uint uposition, uint uflags, ref MenuItemInfo mii);
 #endregion
 	}
 }

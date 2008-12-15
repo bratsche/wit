@@ -5,26 +5,6 @@ using System.Runtime.CompilerServices;
 
 namespace wit
 {
-	public struct MenuItem
-	{
-		public string Text;
-		public string Command;
-		public string HelpText;
-	}
-
-	public enum MIIM : uint
-	{
-		STATE =			0x00000001,
-		ID =	        0x00000002,
-		SUBMENU	=		0x00000004,
-		CHECKMARKS =	0x00000008,
-		TYPE =			0x00000010,
-		DATA =			0x00000020,
-		STRING =		0x00000040,
-		BITMAP =		0x00000080,
-		FTYPE =			0x00000100
-	}
-
 	public enum	MF : uint
 	{
 		INSERT =        0x00000000,
@@ -189,23 +169,6 @@ namespace wit
 	
 	
 	[StructLayout(LayoutKind.Sequential)]
-	public struct MENUITEMINFO
-	{
-		public uint cbSize;
-		public uint fMask;
-		public uint fType;
-		public uint fState;
-		public int	wID;
-		public int	/*HMENU*/	  hSubMenu;
- 		public int	/*HBITMAP*/   hbmpChecked;
-		public int	/*HBITMAP*/	  hbmpUnchecked;
-		public int	/*ULONG_PTR*/ dwItemData;
-		public String dwTypeData;
-		public uint cch;
-		public int /*HBITMAP*/ hbmpItem;
-	}
-
-	[StructLayout(LayoutKind.Sequential)]
 	public struct FORMATETC
 	{
 		public CLIPFORMAT	cfFormat;
@@ -223,61 +186,24 @@ namespace wit
 	  public uint pUnkForRelease;
 	}
 
-	[StructLayout(LayoutKind.Sequential, CharSet=CharSet.Unicode)]
-	public struct INVOKECOMMANDINFO
-	{
-		//NOTE: When SEE_MASK_HMONITOR is set, hIcon is treated as hMonitor
-		public uint cbSize;						// sizeof(CMINVOKECOMMANDINFO)
-		public uint fMask;						// any combination of CMIC_MASK_*
-		public uint wnd;						// might be NULL (indicating no owner window)
-		public int verb;
-		[MarshalAs(UnmanagedType.LPStr)]
-		public string parameters;				// might be NULL (indicating no parameter)
-		[MarshalAs(UnmanagedType.LPStr)]
-		public string directory;				// might be NULL (indicating no specific directory)
-		public int Show;						// one of SW_ values for ShowWindow() API
-		public uint HotKey;
-		public uint hIcon;
-	}
-
-	[ComImport(), InterfaceType(ComInterfaceType.InterfaceIsIUnknown), GuidAttribute("0000010e-0000-0000-C000-000000000046")]
+	[ComImport, InterfaceType(ComInterfaceType.InterfaceIsIUnknown), GuidAttribute("0000010e-0000-0000-C000-000000000046")]
 	public interface IDataObject
 	{
-		[PreserveSig()]
-		int GetData(ref FORMATETC a, ref STGMEDIUM b);
-		[PreserveSig()]
-		void GetDataHere(int a, ref STGMEDIUM b);
-		[PreserveSig()]
-		int QueryGetData(int a);
-		[PreserveSig()]
-		int GetCanonicalFormatEtc(int a, ref int b);
-		[PreserveSig()]
-		int SetData(int a, int b, int c);
-		[PreserveSig()]
-		int EnumFormatEtc(uint a, ref Object b);
-		[PreserveSig()]
-		int DAdvise(int a, uint b, Object c, ref uint d);
-		[PreserveSig()]
-		int DUnadvise(uint a);
-		[PreserveSig()]
-		int EnumDAdvise(ref Object a);
+		[PreserveSig] int GetData(ref FORMATETC a, ref STGMEDIUM b);
+		[PreserveSig] void GetDataHere(int a, ref STGMEDIUM b);
+		[PreserveSig] int QueryGetData(int a);
+		[PreserveSig] int GetCanonicalFormatEtc(int a, ref int b);
+		[PreserveSig] int SetData(int a, int b, int c);
+		[PreserveSig] int EnumFormatEtc(uint a, ref Object b);
+		[PreserveSig] int DAdvise(int a, uint b, Object c, ref uint d);
+		[PreserveSig] int DUnadvise(uint a);
+		[PreserveSig] int EnumDAdvise(ref Object a);
 	}
 
-	[ComImport(), InterfaceType(ComInterfaceType.InterfaceIsIUnknown), GuidAttribute("000214e8-0000-0000-c000-000000000046")]
+	[ComImport, InterfaceType(ComInterfaceType.InterfaceIsIUnknown), GuidAttribute("000214e8-0000-0000-c000-000000000046")]
 	public interface IShellExtInit
 	{
-		[PreserveSig()]
-		int Initialize (IntPtr pidlFolder, IntPtr lpdobj, uint /*HKEY*/ hKeyProgID);
-	}
-
-	[ComImport(), InterfaceType(ComInterfaceType.InterfaceIsIUnknown), GuidAttribute("000214e4-0000-0000-c000-000000000046")]
-	public	interface IContextMenu
-	{
-		// IContextMenu methods
-		[PreserveSig()]
-		int	QueryContextMenu(uint hmenu, uint iMenu, int idCmdFirst, int idCmdLast, uint uFlags);
-		void	InvokeCommand (/*IntPtr*/ [In] ref CommandInfo pici);
-		[PreserveSig()]
-		void	GetCommandString(int idcmd, uint uflags, int reserved, StringBuilder commandstring, int cch);
+        [PreserveSig] int Initialize(IntPtr pidlFolder, IntPtr lpdobj, uint /*HKEY*/ hKeyProgID);
+        //[PreserveSig] int Initialize([In] ref ITEMIDLIST pidlFolder, IntPtr lpdobj, uint /*HKEY*/ hKeyProgID);
 	}
 }

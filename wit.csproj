@@ -97,6 +97,9 @@
     <Compile Include="Helpers.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="IContextMenu.cs" />
+    <Compile Include="MenuItem.cs" />
+    <Compile Include="MenuItemInfo.cs" />
     <Compile Include="ShellExtLib.cs">
       <SubType>Code</SubType>
     </Compile>

@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Diagnostics;
 using System.Globalization;
 using System.ComponentModel;
+using System.Collections.Generic;
 using System.Security.Permissions;
 using System.Runtime.InteropServices;
 using System.Runtime.CompilerServices;
@@ -15,36 +16,44 @@ using Microsoft.Win32;
 namespace wit
 {
     [Guid("66ABF5B3-9113-4010-92C4-B66CD2D86121")]
-	public class CommandShellExtension : IShellExtInit, IContextMenu
+	public class WitShellExtension : IShellExtInit, IContextMenu
 	{
         const string guid = "{66ABF5B3-9113-4010-92C4-B66CD2D86121}";
 
 #region Protected Members
 		protected IDataObject m_dataObject = null;
 		uint m_hDrop = 0;
-		MenuItem[] m_items;
+        List<MenuItem> menu_items;
 #endregion
 
 #region IContextMenu
 		int	IContextMenu.QueryContextMenu(uint hMenu, uint iMenu, int idCmdFirst, int idCmdLast, uint uFlags)
 		{
 			int id = 1;
+            uint pos = 0;
 			if ((uFlags & 0xf) == 0 || (uFlags & (uint)CMF.CMF_EXPLORE) != 0)
 			{
 				uint nselected = Helpers.DragQueryFile(m_hDrop, 0xffffffff, null, 0);
 				if (nselected == 1)
 				{
+                    /*
                     uint hmnuPopup = Helpers.CreatePopupMenu();
                     id = PopulateMenu(hmnuPopup, idCmdFirst + id);
 
-                    MENUITEMINFO mii = new MENUITEMINFO();
+                    MenuItemInfo mii = new MenuItemInfo();
                     mii.cbSize = 48;
-                    mii.fMask = (uint)MIIM.TYPE | (uint)MIIM.STATE | (uint)MIIM.SUBMENU;
+                    mii.fMask = (uint)MIIM.Type | (uint)MIIM.State | (uint)MIIM.SubMenu;
                     mii.hSubMenu = (int)hmnuPopup;
                     mii.fType = (uint)MF.STRING;
                     mii.dwTypeData = "ACTIONS";
                     mii.fState = (uint)MF.ENABLED;
                     Helpers.InsertMenuItem(hMenu, (uint)iMenu, 1, ref mii);
+                    */
+
+                    foreach (MenuItem i in menu_items)
+                    {
+                        AddMenuItem(hMenu, i.Text, id++, pos++);
+                    }
 				}
 			}
 			return id;
@@ -52,9 +61,9 @@ namespace wit
 
         void AddMenuItem(uint hMenu, string text, int id, uint position)
         {
-            MENUITEMINFO mii = new MENUITEMINFO();
+            MenuItemInfo mii = new MenuItemInfo();
             mii.cbSize = 48;
-            mii.fMask = (uint)MIIM.ID | (uint)MIIM.TYPE | (uint)MIIM.STATE;
+            mii.fMask = (uint)MIIM.ID | (uint)MIIM.Type | (uint)MIIM.State;
             mii.wID = id;
             mii.fType = (uint)MF.STRING;
             mii.dwTypeData = text;
@@ -114,10 +123,10 @@ namespace wit
 			switch(uFlags)
 			{
 			case (uint)GCS.VERB:
-				commandString = new StringBuilder(m_items[idCmd - 1].Command.Substring(1, cchMax-1));
+				commandString = new StringBuilder(menu_items[idCmd - 1].Command.Substring(1, cchMax-1));
 				break;
 			case (uint)GCS.HELPTEXT:
-				commandString = new StringBuilder(m_items[idCmd - 1].HelpText.Substring(1, cchMax));
+				commandString = new StringBuilder(menu_items[idCmd - 1].HelpText.Substring(1, cchMax));
 				break;
 			case (uint)GCS.VALIDATE:
 				break;
@@ -133,24 +142,12 @@ namespace wit
                 Console.WriteLine(index);
             }
             catch (Exception) { }
-            /*
-             *
-			try
-			{
-				Type typINVOKECOMMANDINFO = Type.GetType("ShellExt.INVOKECOMMANDINFO");
-				INVOKECOMMANDINFO ici = (INVOKECOMMANDINFO)Marshal.PtrToStructure(pici, typINVOKECOMMANDINFO);
-				if (ici.verb - 1 <= m_items.Length)
-					ExecuteCommand(m_items[ici.verb - 1].Command);
-			}
-			catch(Exception)
-			{
-			}
-            */
 		}
 #endregion
 
 #region IShellExtInit
-		int	IShellExtInit.Initialize (IntPtr pidlFolder, IntPtr lpdobj, uint hKeyProgID)
+        //int IShellExtInit.Initialize([In] ref ITEMIDLIST pidlFolder, IntPtr lpdobj, uint hKeyProgID)
+		int IShellExtInit.Initialize (IntPtr pidlFolder, IntPtr lpdobj, uint hKeyProgID)
 		{
 			try
 			{
@@ -169,34 +166,21 @@ namespace wit
 					m_dataObject.GetData(ref fmt, ref medium);
 					m_hDrop = medium.hGlobal;
 
-					// Now retrieve the menu information from the registry
-					RegistryKey sc = Registry.LocalMachine;
-					sc = sc.OpenSubKey("Software\\Microsoft\\wit", true);
-					if (sc.SubKeyCount > 0)
-					{
-						m_items = new MenuItem[sc.SubKeyCount];
-						int	i=0;
-						foreach(string name in sc.GetSubKeyNames())
-						{
-							try
-							{
-								RegistryKey item = sc.OpenSubKey(name, true);
-								string command = (string)item.GetValue("");
-								MenuItem m = new MenuItem();
-                                m.Text = name;
-                                m.Command = command;
-								m_items[i] = m;
-								++i;
-							}
-							catch(Exception)
-							{
-							}
-						}
-					}
-					else
-					{
-						m_items = new MenuItem[0];
-					}
+                    StringBuilder sb = new StringBuilder();
+                    Helpers.SHGetPathFromIDList(pidlFolder, sb);
+                    string path = sb.ToString();
+
+                    if (menu_items == null)
+                        menu_items = new List<MenuItem>();
+
+                    // Setup our menu items
+                    int status = RunProcess(@"C:\Program Files\Git\bin\git", "rev-parse --cdup");
+                    if (status < 0)
+                        menu_items.Add(new MenuItem("Cannot find git"));
+                    else if (status > 0)
+                        menu_items.Add(new MenuItem("Init Git Repo"));
+                    else if (status == 0)
+                        menu_items.Add(new MenuItem("Git Actions"));
 				}
 			}
 			catch(Exception)
@@ -208,8 +192,8 @@ namespace wit
 #endregion
 
 #region Registration
-		[System.Runtime.InteropServices.ComRegisterFunctionAttribute()]
-		static void RegisterServer(String str1)
+		[ComRegisterFunctionAttribute]
+		static void RegisterServer(Type type)
 		{
 			try
 			{
@@ -238,8 +222,8 @@ namespace wit
 			}
 		}
 
-		[System.Runtime.InteropServices.ComUnregisterFunctionAttribute()]
-		static void UnregisterServer(String str1)
+		[ComUnregisterFunctionAttribute]
+		static void UnregisterServer(Type type)
 		{
 			try
 			{
