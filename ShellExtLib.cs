@@ -157,16 +157,6 @@ namespace wit
 		public int hStdOutput;
 		public int hStdError;
 	}
-
-	[StructLayout(LayoutKind.Sequential)]
-	public class ProcessInformation
-	{
-		public int hProcess;
-		public int hThread;
-		public int dwProcessId;
-		public int dwThreadId;
-	}
-	
 	
 	[StructLayout(LayoutKind.Sequential)]
 	public struct FORMATETC

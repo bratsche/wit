@@ -17,19 +17,6 @@ namespace wit
 		internal static extern uint GetFileAttributes([MarshalAs(UnmanagedType.LPTStr)]string lpPathName);
 		internal const uint FILE_ATTRIBUTE_DIRECTORY = 0x00000010;
 
-		[DllImport("kernel32.dll")]
-		internal static extern Boolean CreateProcess(
-			string	lpApplicationName,
-			string	lpCommandLine,
-			uint	lpProcessAttributes,
-			uint	lpThreadAttributes,
-			Boolean bInheritHandles,
-			uint	dwCreationFlags,
-			uint	lpEnvironment,
-			string	lpCurrentDirectory,
-			StartupInfo lpStartupInfo,
-			ProcessInformation lpProcessInformation);
-
 		[DllImport("shell32")]
 		internal static extern uint DragQueryFile(uint hDrop,uint iFile, StringBuilder buffer, int cch);
 
