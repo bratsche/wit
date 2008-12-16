@@ -44,7 +44,6 @@ namespace wit
 #region IContextMenu
 		int	IContextMenu.QueryContextMenu(uint hMenu, uint iMenu, int idCmdFirst, int idCmdLast, uint uFlags)
 		{
-			//int id = 1;
             id_hash[hMenu] = 1;
 			if ((uFlags & 0xf) == 0 || (uFlags & (uint)CMF.CMF_EXPLORE) != 0)
 			{
@@ -69,24 +68,22 @@ namespace wit
 
         private void InsertMenuItem(uint hMenu, MenuItem item, uint pos)
         {
-            if (item.Requisites != state)
+            if ((state & item.Requisites) == item.Requisites)
             {
-                return;
-            }
-
-            if (item is PopupItem)
-            {
-                PopupItem popup = item as PopupItem;
-                uint popup_id = AddPopupItem(hMenu, popup, pos);
-                uint popup_pos = 0;
-                foreach (MenuItem child in popup)
+                if (item is PopupItem)
                 {
-                    InsertMenuItem(popup_id, child, popup_pos++);
+                    PopupItem popup = item as PopupItem;
+                    uint popup_id = AddPopupItem(hMenu, popup, pos);
+                    uint popup_pos = 0;
+                    foreach (MenuItem child in popup)
+                    {
+                        InsertMenuItem(popup_id, child, popup_pos++);
+                    }
                 }
-            }
-            else
-            {
-                AddMenuItem(hMenu, item, pos);
+                else
+                {
+                    AddMenuItem(hMenu, item, pos);
+                }
             }
         }
 
@@ -162,7 +159,6 @@ namespace wit
 			}
 		}
 		
-        //void IContextMenu.InvokeCommand(IntPtr pici)
 		void IContextMenu.InvokeCommand ([In] ref CommandInfo pici)
 		{
             try
@@ -205,11 +201,11 @@ namespace wit
                     // Setup our menu items
                     int status = RunProcess(@"C:\Program Files\Git\bin\git", "rev-parse --cdup");
                     if (status < 0)
-                        state = GitState.GitNotFound; //menu_items.Add(new MenuItem("Cannot find git"));
+                        state = GitState.GitNotFound;
                     else if (status > 0)
-                        state = 0;  //menu_items.Add(new MenuItem("Init GIT Repo"));
+                        state = 0;
                     else if (status == 0)
-                        state = GitState.InGitDirectory; //menu_items.Add(new MenuItem("Git Actions"));
+                        state = GitState.InGitDirectory;
 				}
 			}
 			catch(Exception)

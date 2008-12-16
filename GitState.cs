@@ -2,6 +2,7 @@
 
 namespace wit
 {
+    [Flags]
     public enum GitState
     {
         GitNotFound         = 0x00000001,
