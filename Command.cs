@@ -197,6 +197,13 @@ namespace wit
 #endregion
 
 #region Registration
+        private static string[] keys = {
+            @"*\shellex\ContextMenuHandlers\wit",
+            @"Directory\Background\shellex\ContextMenuHandlers\wit",
+            @"Directory\shellex\ContextMenuHandlers\wit",
+            @"Folder\shellex\ContextMenuHandlers\wit"
+        };
+
 		[ComRegisterFunctionAttribute]
 		static void RegisterServer(Type type)
 		{
@@ -215,11 +222,13 @@ namespace wit
 				rk.SetValue(guid.ToString(), "wit shell extension");
 				rk.Close();
 
-
-				root = Registry.ClassesRoot;
-				rk = root.CreateSubKey("Folder\\shellex\\ContextMenuHandlers\\wit");
-				rk.SetValue("", guid.ToString());
-				rk.Close();
+                foreach (string s in keys)
+                {
+                    root = Registry.ClassesRoot;
+                    rk = root.CreateSubKey(s);
+                    rk.SetValue("", guid.ToString());
+                    rk.Close();
+                }
 			}
 			catch(Exception e)
 			{
@@ -240,9 +249,11 @@ namespace wit
 				rk.DeleteValue(guid);
 				rk.Close();
 
-
-                root = Registry.ClassesRoot;
-				root.DeleteSubKey("Folder\\shellex\\ContextMenuHandlers\\wit");
+                foreach (string s in keys)
+                {
+                    root = Registry.ClassesRoot;
+                    root.DeleteSubKey(s);
+                }
 			}
 			catch(Exception e)
 			{
