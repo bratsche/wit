@@ -1,6 +1,12 @@
 To build you currently need Visual Studio 2008.  If that's a problem, let me
 know and we'll try to figure out another build system.
 
+Before building, you need to change one line in Git.cs.  In the method
+'RunProcess' it currently sets the environment $HOME to my home
+dir in cygwin (\cygwin\home\cody).  You need to change this to wherever
+you keep your .gitconfig file.  For bonus points, figure out how to make
+this happen automagically. :)
+
 To install this you need to do:
   regasm wit.dll
   gacutil /i wit.dll
