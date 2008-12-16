@@ -94,6 +94,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="CommandInfo.cs" />
+    <Compile Include="GitState.cs" />
     <Compile Include="Helpers.cs">
       <SubType>Code</SubType>
     </Compile>
