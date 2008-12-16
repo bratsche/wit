@@ -89,9 +89,6 @@ namespace wit
                 AddMenuItem(hMenu, "Git Actions", id++, 0);
             }
 
-            //AddMenuItem(hMenu, "Clone Git Repository", id++, 0);
-            //AddMenuItem(hMenu, "Create Git Repository", id++, 1);
-
             return id;
         }
 
@@ -182,10 +179,9 @@ namespace wit
                     if (status < 0)
                         menu_items.Add(new MenuItem("Cannot find git"));
                     else if (status > 0)
-                        menu_items.Add(new MenuItem("Init Git Repo"));
+                        menu_items.Add(new MenuItem("Init GIT Repo"));
                     else if (status == 0)
                         menu_items.Add(new MenuItem("Git Actions"));
-
 				}
 			}
 			catch(Exception)
@@ -204,6 +200,14 @@ namespace wit
             @"Folder\shellex\ContextMenuHandlers\wit"
         };
 
+        static RegistryKey ApprovedShellExtensionsKey
+        {
+            get
+            {
+                return Registry.LocalMachine.OpenSubKey("Software\\Microsoft\\Windows\\CurrentVersion\\Shell Extensions\\Approved", true);
+            }
+        }
+
 		[ComRegisterFunctionAttribute]
 		static void RegisterServer(Type type)
 		{
@@ -211,24 +215,24 @@ namespace wit
 			{
 				RegistryKey root;
 				RegistryKey rk;
+                /*
 				root = Registry.CurrentUser;
 				rk = root.OpenSubKey("Software\\Microsoft\\Windows\\CurrentVersion\\Explorer", true);
 				rk.SetValue("DesktopProcess", 1);
 				rk.Close();
+                */
 
-
-                root = Registry.LocalMachine;
-				rk = root.OpenSubKey("Software\\Microsoft\\Windows\\CurrentVersion\\Shell Extensions\\Approved", true);
-				rk.SetValue(guid.ToString(), "wit shell extension");
-				rk.Close();
-
+                root = Registry.ClassesRoot;
                 foreach (string s in keys)
                 {
-                    root = Registry.ClassesRoot;
                     rk = root.CreateSubKey(s);
                     rk.SetValue("", guid.ToString());
                     rk.Close();
                 }
+
+                rk = ApprovedShellExtensionsKey;
+                rk.SetValue(guid.ToString(), "wit shell extension");
+                rk.Close();
 			}
 			catch(Exception e)
 			{
@@ -241,14 +245,14 @@ namespace wit
 		{
 			try
 			{
-				RegistryKey root;
+                RegistryKey root;
 				RegistryKey rk;
 
-				root = Registry.LocalMachine;
-				rk = root.OpenSubKey("Software\\Microsoft\\Windows\\CurrentVersion\\Shell Extensions\\Approved", true);
+                rk = ApprovedShellExtensionsKey;
 				rk.DeleteValue(guid);
 				rk.Close();
 
+                root = Registry.ClassesRoot;
                 foreach (string s in keys)
                 {
                     root = Registry.ClassesRoot;
