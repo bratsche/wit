@@ -24,6 +24,7 @@ namespace wit
 		private IDataObject m_dataObject = null;
 		private uint m_hDrop = 0;
         private Dictionary<uint, int> id_hash = new Dictionary<uint, int>();
+        private Git git = new Git();
 
         private MenuItem[] actions_popup_items = new MenuItem[] {
             new MenuItem("Git Not Found", GitState.GitNotFound),
@@ -120,29 +121,6 @@ namespace wit
             actions_hash[id] = item;
             id_hash[hMenu] = ++id;
         }
-
-        private int RunProcess(string command, string args)
-        {
-            var proc = new Process();
-            proc.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
-            proc.StartInfo.FileName = command;
-            if (args != String.Empty)
-            {
-                proc.StartInfo.Arguments = args;
-            }
-
-            try
-            {
-                proc.Start();
-                proc.WaitForExit();
-            }
-            catch (Win32Exception e)
-            {
-                return -1;
-            }
-
-            return proc.ExitCode;
-        }
 		
 		void IContextMenu.GetCommandString(int idCmd, uint uFlags, int pwReserved, StringBuilder commandString, int cchMax)
 		{
@@ -198,17 +176,10 @@ namespace wit
                     // Change the pwd
                     Directory.SetCurrentDirectory(filename);
 
-                    // Setup our menu items
-                    int status = RunProcess(@"C:\Program Files\Git\bin\git", "rev-parse --cdup");
-                    if (status < 0)
-                        state = GitState.GitNotFound;
-                    else if (status > 0)
-                        state = 0;
-                    else if (status == 0)
-                        state = GitState.InGitDirectory;
+                    Console.WriteLine(git.UserName);
 				}
 			}
-			catch(Exception)
+			catch(Exception e)
 			{
 			}
 

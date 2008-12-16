@@ -10,9 +10,6 @@ namespace wit
 		[DllImport("kernel32.dll")]
 		internal static extern bool SetCurrentDirectory([MarshalAs(UnmanagedType.LPTStr)]string lpPathName);
 
-        //[DllImport("shell32.dll")]
-        //internal static extern bool SHGetPathFromIDList(IntPtr /*PCIDLIST_ABSOLUTE*/ pidl, [MarshalAs(UnmanagedType.LPStr)]string pszPath);
-
         [DllImport("shell32.dll")]
         internal static extern bool SHGetPathFromIDList(IntPtr pidl, StringBuilder path);
 
