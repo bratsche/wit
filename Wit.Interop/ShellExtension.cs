@@ -19,7 +19,6 @@ namespace Wit
     {
         public abstract MenuItem[] MenuItems { get; }
 
-        public GitState State { get { return state; } }
         public Git Git { get { return git; } } // <-- this is my favorite line of code ever.
 
 #region IShellExtInit implementation
@@ -115,7 +114,7 @@ namespace Wit
 
         private void InsertMenuItem(uint hMenu, MenuItem item, uint pos)
         {
-            if ((state & item.Requisites) == item.Requisites)
+            if ((Git.State & item.Requisites) == item.Requisites)
             {
                 if (item is PopupItem)
                 {
@@ -278,7 +277,6 @@ namespace Wit
 #region private data
         private IDataObject m_dataObject = null;
         private uint m_hDrop = 0;
-        private GitState state;
         private Git git = new Git();
         private Dictionary<uint, int> id_hash = new Dictionary<uint, int>();
         private Dictionary<int, MenuItem> actions_hash = new Dictionary<int, MenuItem>();
