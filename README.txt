@@ -19,6 +19,11 @@ Each time you rebuild it you need to do:
 
 You'll need to restart your shell, and possibly your system. :(
 
+If you make changes to things like the Guid or to the registry keys, make
+sure you regasm /u with.dll -before- you rebuild the DLL with your changes.
+And once you rebuild the DLL, you'll need to regasm and gacutil /i it.
+If you need to add regisry keys, use the RegisteredBy attribute.
+
 And to completely uninstall it:
   gacutil /u wit
   regasm /u wit.dll
