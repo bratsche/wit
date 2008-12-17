@@ -2,14 +2,14 @@
 using System.Collections;
 using System.Collections.Generic;
 
-namespace wit
+namespace Wit
 {
     public enum MenuItemFlags
     {
         ItemIsFolder
     }
 
-    class MenuItem
+    public class MenuItem
     {
         public MenuItem()
         {

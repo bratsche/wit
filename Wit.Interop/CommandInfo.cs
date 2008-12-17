@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace wit
+namespace Wit.Interop
 {
     [Flags]
     public enum CommandInfoMaskFlags

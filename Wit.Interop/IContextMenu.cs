@@ -3,7 +3,7 @@ using System.Text;
 using System.Runtime.InteropServices;
 using System.Runtime.CompilerServices;
 
-namespace wit
+namespace Wit.Interop
 {
     [ComImport, InterfaceType(ComInterfaceType.InterfaceIsIUnknown), GuidAttribute("000214e4-0000-0000-c000-000000000046")]
     public interface IContextMenu
@@ -20,7 +20,7 @@ namespace wit
 
         [PreserveSig]
         void GetCommandString(int idcmd,
-                              uint uflags,
+                              GetCommandStringFlags uflags,
                               int reserved,
                               StringBuilder commandstring,
                               int cch);

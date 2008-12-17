@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace wit
+namespace Wit
 {
     [Flags]
     public enum GitState

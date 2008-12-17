@@ -3,7 +3,7 @@ using System.Text;
 using System.Diagnostics;
 using System.ComponentModel;
 
-namespace wit
+namespace Wit
 {
     public class Git
     {
@@ -52,9 +52,10 @@ namespace wit
             proc.StartInfo.UseShellExecute = false;
             proc.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
             proc.StartInfo.CreateNoWindow = true;
+            proc.StartInfo.LoadUserProfile = true;
 
             // XXX: Whoa, no way!  Fix this shit.
-            proc.StartInfo.EnvironmentVariables["HOME"] = @"C:\cygwin\home\cody";
+            proc.StartInfo.EnvironmentVariables["HOME"] = Environment.GetEnvironmentVariable("GIT_HOME");
             if (args != String.Empty)
             {
                 proc.StartInfo.Arguments = args;

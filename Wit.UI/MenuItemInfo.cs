@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-namespace wit
+namespace Wit
 {
     public enum MIIM : uint
     {
