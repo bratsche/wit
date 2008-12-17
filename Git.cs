@@ -54,7 +54,7 @@ namespace Wit
             proc.StartInfo.CreateNoWindow = true;
             proc.StartInfo.LoadUserProfile = true;
 
-            // XXX: Whoa, no way!  Fix this shit.
+            // XXX: We should find a better solution.
             proc.StartInfo.EnvironmentVariables["HOME"] = Environment.GetEnvironmentVariable("GIT_HOME");
             if (args != String.Empty)
             {
