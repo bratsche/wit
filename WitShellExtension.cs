@@ -13,7 +13,7 @@ namespace Wit
     [RegisteredBy(@"Directory\shellex\ContextMenuHandlers\wit")]
     [RegisteredBy(@"Drive\shellex\ContextMenuHandlers\wit")]
     public class WitShellExtension : ShellExtension
-	{
+    {
         public override MenuItem[] MenuItems
         {
             get { return actions_popup_items; }
