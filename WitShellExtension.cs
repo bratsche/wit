@@ -1,15 +1,6 @@
 using System;
-using System.IO;
-using System.Text;
 using System.Reflection;
-using System.Diagnostics;
-using System.Globalization;
-using System.ComponentModel;
-using System.Collections.Generic;
-using System.Security.Permissions;
 using System.Runtime.InteropServices;
-using System.Runtime.CompilerServices;
-using Microsoft.Win32;
 
 using Wit.Interop;
 
@@ -39,7 +30,6 @@ namespace Wit
                     new MenuItem("Branch", GitState.InGitDirectory)
                 })
         };
-
 #endregion
 	}
 }
