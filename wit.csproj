@@ -101,7 +101,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Wit.Interop\Tymed.cs" />
-    <Compile Include="Wit.Interop\WitShellExtension.cs">
+    <Compile Include="WitShellExtension.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Wit.Interop\CommandInfo.cs" />

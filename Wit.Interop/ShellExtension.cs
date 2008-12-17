@@ -11,7 +11,9 @@ using System.Runtime.InteropServices;
 using System.Runtime.CompilerServices;
 using Microsoft.Win32;
 
-namespace Wit.Interop
+using Wit.Interop;
+
+namespace Wit
 {
     public abstract class ShellExtension : IShellExtInit, IContextMenu
     {
