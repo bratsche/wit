@@ -1,5 +1,6 @@
 To build you currently need Visual Studio 2008.  If that's a problem, let me
-know and we'll try to figure out another build system.
+know and we'll try to figure out another build system.  You also need to
+install msysGit.  Google for it.
 
 Before building, you need to change one line in Git.cs.  In the method
 'RunProcess' it currently sets the environment $HOME to my home
