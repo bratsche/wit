@@ -13,13 +13,12 @@ using Microsoft.Win32;
 
 using Wit.Interop;
 
-namespace Wit
+namespace Wit.Interop
 {
     public abstract class ShellExtension : IShellExtInit, IContextMenu
     {
         public abstract MenuItem[] MenuItems { get; }
-
-        public Git Git { get { return git; } } // <-- this is my favorite line of code ever.
+        public static Git Git { get { return git; } } // <-- this is my favorite line of code ever.
 
 #region IShellExtInit implementation
         int IShellExtInit.Initialize(IntPtr pidlFolder, IntPtr lpdobj, IntPtr hKeyProgID)
@@ -280,7 +279,7 @@ namespace Wit
 #region private data
         private IDataObject m_dataObject = null;
         private uint m_hDrop = 0;
-        private Git git = new Git();
+        private static Git git = new Git();
         private Dictionary<uint, int> id_hash = new Dictionary<uint, int>();
         private Dictionary<int, MenuItem> actions_hash = new Dictionary<int, MenuItem>();
         private int first_id;
