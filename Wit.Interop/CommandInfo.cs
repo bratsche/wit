@@ -1,9 +1,10 @@
 ﻿using System;
+using System.Runtime.InteropServices;
 
 namespace Wit.Interop
 {
     [Flags]
-    public enum CommandInfoMaskFlags
+    public enum CommandInfoMaskFlags : uint
     {
         None = 0x00000000,
         Icon = 0x00000010,
@@ -13,16 +14,17 @@ namespace Wit.Interop
         AsyncOk = 0x00100000
     }
 
+    [StructLayout(LayoutKind.Sequential, CharSet=CharSet.Unicode)]
     public struct CommandInfo
     {
-        internal uint cbSize;
-        internal CommandInfoMaskFlags fMask;
-        internal IntPtr hwnd;
-        internal IntPtr lpVerb;
-        internal string lpParameters;
-        internal string lpDirectory;
-        internal int nShow;
-        internal uint dwHotKey;
-        internal IntPtr hIcon;
+        public uint cbSize;
+        public uint /*CommandInfoMaskFlags*/ fMask;
+        public uint hwnd;
+        public int Verb;
+        [MarshalAs(UnmanagedType.LPStr)] public string lpParameters;
+        [MarshalAs(UnmanagedType.LPStr)] public string lpDirectory;
+        public int nShow;
+        public uint dwHotKey;
+        public uint hIcon;
     }
 }

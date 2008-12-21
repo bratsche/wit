@@ -52,7 +52,7 @@ namespace Wit
                     Console.WriteLine(git.UserName);
                 }
             }
-            catch (Exception e)
+            catch (Exception)
             {
             }
 
@@ -63,7 +63,7 @@ namespace Wit
 #region IContextMenu implementation
         int IContextMenu.QueryContextMenu(uint hMenu, uint iMenu, int idCmdFirst, int idCmdLast, uint uFlags)
         {
-            id_hash[hMenu] = 1;
+            id_hash[hMenu] = idCmdFirst;
             if ((uFlags & 0xf) == 0 || (uFlags & (uint)ContextMenuFlags.Explore) != 0)
             {
                 uint nselected = Helpers.DragQueryFile(m_hDrop, 0xffffffff, null, 0);
@@ -95,7 +95,7 @@ namespace Wit
         {
             try
             {
-                int index = (int)pici.lpVerb;
+                int index = pici.Verb;
                 Console.WriteLine(index);
             }
             catch (Exception) { }
