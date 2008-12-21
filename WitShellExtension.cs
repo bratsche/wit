@@ -4,6 +4,8 @@ using System.Runtime.InteropServices;
 
 using Wit.Interop;
 
+using Gtk;
+
 [assembly:AssemblyKeyFile(@"..\..\wit.snk")]
 
 namespace Wit
@@ -19,11 +21,27 @@ namespace Wit
             get { return actions_popup_items; }
         }
 
+        private static void OnInitRepo(object o, EventArgs e)
+        {
+            ShowMessage("OnInitRepo()");
+        }
+
+        private static void OnCloneRepo(object o, EventArgs e)
+        {
+            ShowMessage("OnCloneRepo()");
+        }
+
+        private static void ShowMessage(string msg)
+        {
+            InfoDialog dialog = new InfoDialog(null, msg, false);
+            dialog.Run();
+        }
+
 #region private members
         private MenuItem[] actions_popup_items = new MenuItem[] {
             new MenuItem("Git Not Found", GitState.GitNotFound),
-            new MenuItem("Init Git Repo", 0),
-            new MenuItem("Clone Git Repo", 0),
+            new MenuItem("Init Git Repo", 0, new EventHandler(OnInitRepo)),
+            new MenuItem("Clone Git Repo", 0, new EventHandler(OnCloneRepo)),
             new PopupItem("Git", GitState.InGitDirectory,
                 new MenuItem[] {
                     new MenuItem("Update", GitState.InGitDirectory),

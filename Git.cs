@@ -7,6 +7,10 @@ namespace Wit
 {
     public class Git
     {
+        public Git()
+        {
+        }
+
         public GitState State
         {
             get

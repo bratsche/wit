@@ -26,6 +26,8 @@ namespace Wit
         {
             try
             {
+                Gtk.Application.Init();
+
                 m_dataObject = null;
                 if (lpdobj != (IntPtr)0)
                 {
@@ -64,6 +66,7 @@ namespace Wit
         int IContextMenu.QueryContextMenu(uint hMenu, uint iMenu, int idCmdFirst, int idCmdLast, uint uFlags)
         {
             id_hash[hMenu] = idCmdFirst;
+            first_id = idCmdFirst;
             if ((uFlags & 0xf) == 0 || (uFlags & (uint)ContextMenuFlags.Explore) != 0)
             {
                 uint nselected = Helpers.DragQueryFile(m_hDrop, 0xffffffff, null, 0);
@@ -95,8 +98,8 @@ namespace Wit
         {
             try
             {
-                int index = pici.Verb;
-                Console.WriteLine(index);
+                int index = pici.Verb + first_id;
+                actions_hash[index].Execute();
             }
             catch (Exception) { }
         }
@@ -280,6 +283,7 @@ namespace Wit
         private Git git = new Git();
         private Dictionary<uint, int> id_hash = new Dictionary<uint, int>();
         private Dictionary<int, MenuItem> actions_hash = new Dictionary<int, MenuItem>();
+        private int first_id;
 #endregion
     }
 }

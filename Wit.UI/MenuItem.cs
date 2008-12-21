@@ -15,16 +15,30 @@ namespace Wit
         {
         }
 
-        public MenuItem(string text, GitState state)
+        public MenuItem(string text, GitState state) :
+            this(text, state, null)
+        {
+        }
+
+        public MenuItem(string text, GitState state, EventHandler callback)
         {
             Text = text;
             Requisites = state;
+            execute = callback;
+        }
+
+        public void Execute()
+        {
+            if (execute != null)
+                execute(this, null);
         }
 
         public string Text = String.Empty;
         public string Command = String.Empty;
         public string HelpText = String.Empty;
         public GitState Requisites;
+
+        private EventHandler execute = null;
     }
 
     class PopupItem : MenuItem, IEnumerable<MenuItem>, IEnumerable
