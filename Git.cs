@@ -13,8 +13,7 @@ namespace Wit
             {
                 if (!initialized)
                 {
-                    string output = String.Empty;
-                    int status = RunProcess(@"C:\Program Files\Git\bin\git", "rev-parse --cdup", ref output);
+                    int status = GitCommand("rev-parse --cdup");
                     if (status < 0)
                         state = GitState.GitNotFound;
                     else if (status > 0)
@@ -34,11 +33,54 @@ namespace Wit
             {
                 if (user_name == String.Empty)
                 {
-                    RunProcess(@"C:\Program Files\Git\bin\git", "config user.name", ref user_name);
+                    GitCommand("config user.name", ref user_name);
                 }
 
                 return user_name;
             }
+        }
+
+        public string Email
+        {
+            get
+            {
+                if (email == String.Empty)
+                {
+                    GitCommand("config user.email", ref email);
+                }
+
+                return email;
+            }
+        }
+
+        public string CurrentBranch
+        {
+            get
+            {
+                if (current_branch == String.Empty)
+                {
+                    GitCommand("branch", ref current_branch);
+                }
+
+                return current_branch;
+            }
+        }
+
+        public void Init()
+        {
+            GitCommand("init");
+        }
+
+#region private methods
+        private int GitCommand(string git_command)
+        {
+            string output = String.Empty;
+            return GitCommand(git_command, ref output);
+        }
+
+        private int GitCommand(string git_command, ref string output)
+        {
+            return RunProcess(@"C:\Program Files\Git\bin\git", git_command, ref output);
         }
 
         private int RunProcess(string command, string args, ref string output)
@@ -71,17 +113,22 @@ namespace Wit
 
                 output = text;
             }
-            catch (Win32Exception e)
+            catch (Win32Exception)
             {
                 return -1;
             }
 
             return proc.ExitCode;
         }
+#endregion
 
+#region private data
         private GitState state;
         private bool initialized = false;
 
         private string user_name = String.Empty;
+        private string email = String.Empty;
+        private string current_branch = String.Empty;
+#endregion
     }
 }
