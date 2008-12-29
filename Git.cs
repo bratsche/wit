@@ -15,19 +15,13 @@ namespace Wit
         {
             get
             {
-                if (!initialized)
-                {
-                    int status = GitCommand("rev-parse --cdup");
-                    if (status < 0)
-                        state = GitState.GitNotFound;
-                    else if (status > 0)
-                        state = 0;
-                    else if (status == 0)
-                        state = GitState.InGitDirectory;
-                    initialized = true;
-                }
+                int status = GitCommand("rev-parse --cdup");
+                if (status < 0)
+                    return GitState.GitNotFound;
+                else if (status == 0)
+                    return GitState.InGitDirectory;
 
-                return state;
+                return 0;
             }
         }
 
@@ -63,7 +57,17 @@ namespace Wit
             {
                 if (current_branch == String.Empty)
                 {
-                    GitCommand("branch", ref current_branch);
+                    string output = String.Empty;
+                    GitCommand("branch", ref output);
+
+                    string[] branches = output.Split('\n');
+                    foreach (string s in branches)
+                    {
+                        if (s.Contains("*"))
+                        {
+                            current_branch = s.Replace("*", String.Empty).Replace(" ", String.Empty).Replace("\n", String.Empty);
+                        }
+                    }
                 }
 
                 return current_branch;
@@ -127,9 +131,6 @@ namespace Wit
 #endregion
 
 #region private data
-        private GitState state;
-        private bool initialized = false;
-
         private string user_name = String.Empty;
         private string email = String.Empty;
         private string current_branch = String.Empty;
