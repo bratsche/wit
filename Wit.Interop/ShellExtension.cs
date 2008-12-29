@@ -11,14 +11,42 @@ using System.Runtime.InteropServices;
 using System.Runtime.CompilerServices;
 using Microsoft.Win32;
 
-using Wit.Interop;
-
 namespace Wit.Interop
 {
-    public abstract class ShellExtension : IShellExtInit, IContextMenu
+    public abstract class ShellExtension : IShellExtInit, IContextMenu, IShellIconOverlayIdentifier
     {
         public abstract MenuItem[] MenuItems { get; }
         public static Git Git { get { return git; } } // <-- this is my favorite line of code ever.
+
+        int IShellIconOverlayIdentifier.IsMemberOf(string iconFileBuffer, int attributes)
+        {
+            // Get the path to run git in.  If iconFileBuffer is a directory, use it.
+            // If it's a non-directory file, then use its directory name.
+            string path = Directory.Exists(iconFileBuffer) ? iconFileBuffer : Path.GetDirectoryName(iconFileBuffer);
+            Directory.SetCurrentDirectory(path);
+
+            if (Git.State == GitState.InGitDirectory)
+                return 0;
+
+            return 1;
+        }
+
+        int IShellIconOverlayIdentifier.GetOverlayInfo(out string iconFileBuffer,
+                                                       int iconFileBufferSize,
+                                                       out int iconIndex,
+                                                       out uint flags)
+        {
+            iconFileBuffer = String.Empty;
+            iconIndex = 0;
+            flags = 0;
+            return 0;
+        }
+
+        int IShellIconOverlayIdentifier.GetPriority(out int priority)
+        {
+            priority = 0;
+            return 0;
+        }
 
 #region IShellExtInit implementation
         int IShellExtInit.Initialize(IntPtr pidlFolder, IntPtr lpdobj, IntPtr hKeyProgID)
@@ -171,108 +199,18 @@ namespace Wit.Interop
 #endregion
 
 #region COM registration
-        static RegistryKey ApprovedShellExtensionsKey
-        {
-            get
-            {
-                return Registry.LocalMachine.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Shell Extensions\Approved", true);
-            }
-        }
-
-        private static string GetGuid(Type type)
-        {
-            GuidAttribute guid_attr = (GuidAttribute)Attribute.GetCustomAttribute(type, typeof(GuidAttribute));
-            string guid = guid_attr.Value;
-
-            return string.Format("{{{0}}}", guid);
-        }
-
-        private static RegistryKey GetCLSKey(Type type)
-        {
-            string guid = GetGuid(type);
-            return Registry.ClassesRoot.CreateSubKey(String.Format(CultureInfo.InvariantCulture, @"CLSID\{0}", guid));
-        }
-
-        static string[] GetKeysFromType(Type type)
-        {
-            RegisteredByAttribute[] attributes = (RegisteredByAttribute[])Attribute.GetCustomAttributes(type, typeof(RegisteredByAttribute));
-            List<string> keys_list = new List<string>();
-            foreach (RegisteredByAttribute a in attributes)
-            {
-                keys_list.Add(a.RegistryKey);
-            }
-
-            return keys_list.ToArray();
-        }
-
         [ComRegisterFunctionAttribute]
         static void RegisterServer(Type type)
         {
-            try
-            {
-                string[] keys = GetKeysFromType(type);
-
-                string guid = GetGuid(type);
-
-                RegistryKey root;
-                RegistryKey rk;
-
-                root = Registry.CurrentUser;
-                rk = root.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Explorer", true);
-                rk.SetValue("DesktopProcess", 1);
-                rk.Close();
-
-                rk = GetCLSKey(type);
-                rk.SetValue(null, "wit");
-
-                root = Registry.ClassesRoot;
-                rk = root.CreateSubKey("wit");
-                rk.SetValue("", "wit");
-                rk.Close();
-                foreach (string s in keys)
-                {
-                    rk = root.CreateSubKey(s);
-                    rk.SetValue("", guid);
-                    rk.Close();
-                }
-
-                rk = ApprovedShellExtensionsKey;
-                rk.SetValue(guid, "wit");
-                rk.Close();
-                root.Close();
-            }
-            catch (Exception e)
-            {
-                System.Console.WriteLine(e.ToString());
-            }
+            RegistryManager rm = new RegistryManager(type);
+            rm.Register();
         }
 
         [ComUnregisterFunctionAttribute]
         static void UnregisterServer(Type type)
         {
-            try
-            {
-                string[] keys = GetKeysFromType(type);
-                string guid = GetGuid(type);
-
-                RegistryKey root;
-                RegistryKey rk;
-
-                rk = ApprovedShellExtensionsKey;
-                rk.DeleteValue(guid);
-                rk.Close();
-
-                root = Registry.ClassesRoot;
-                foreach (string s in keys)
-                {
-                    root = Registry.ClassesRoot;
-                    root.DeleteSubKey(s);
-                }
-            }
-            catch (Exception e)
-            {
-                System.Console.WriteLine(e.ToString());
-            }
+            RegistryManager rm = new RegistryManager(type);
+            rm.Unregister();
         }
 #endregion
 
