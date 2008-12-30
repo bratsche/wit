@@ -92,7 +92,7 @@ namespace Wit.Interop
 #region IContextMenu implementation
         int IContextMenu.QueryContextMenu(uint hMenu, uint iMenu, int idCmdFirst, int idCmdLast, uint uFlags)
         {
-            id_hash[hMenu] = idCmdFirst;
+            current_id = idCmdFirst;
             first_id = idCmdFirst;
             if ((uFlags & 0xf) == 0 || (uFlags & (uint)ContextMenuFlags.Explore) != 0)
             {
@@ -103,7 +103,7 @@ namespace Wit.Interop
                 }
             }
 
-            return id_hash[hMenu];
+            return current_id;
         }
 
         void IContextMenu.GetCommandString(int idCmd, GetCommandStringFlags uFlags, int pwReserved, StringBuilder commandString, int cchMax)
@@ -111,6 +111,7 @@ namespace Wit.Interop
             switch (uFlags)
             {
                 case GetCommandStringFlags.Verb:
+                case GetCommandStringFlags.VerbW:
                     commandString = new StringBuilder(actions_hash[idCmd].Command.Substring(1, cchMax - 1));
                     break;
                 case GetCommandStringFlags.HelpText:
@@ -166,7 +167,6 @@ namespace Wit.Interop
         uint AddPopupItem(uint hMenu, MenuItem item, uint position)
         {
             uint popup = Helpers.CreatePopupMenu();
-            id_hash[popup] = 1;
 
             MenuItemInfo mii = new MenuItemInfo();
             mii.cbSize = 48;
@@ -182,7 +182,7 @@ namespace Wit.Interop
 
         void AddMenuItem(uint hMenu, MenuItem item, uint position)
         {
-            int id = id_hash[hMenu];
+            int id = current_id;
 
             MenuItemInfo mii = new MenuItemInfo();
             mii.cbSize = 48;
@@ -194,7 +194,7 @@ namespace Wit.Interop
             Helpers.InsertMenuItem(hMenu, position, 1, ref mii);
 
             actions_hash[id] = item;
-            id_hash[hMenu] = ++id;
+            current_id = ++id;
         }
 #endregion
 
@@ -218,7 +218,7 @@ namespace Wit.Interop
         private IDataObject m_dataObject = null;
         private uint m_hDrop = 0;
         private static Git git = new Git();
-        private Dictionary<uint, int> id_hash = new Dictionary<uint, int>();
+        private int current_id;
         private Dictionary<int, MenuItem> actions_hash = new Dictionary<int, MenuItem>();
         private int first_id;
 #endregion
