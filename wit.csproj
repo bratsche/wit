@@ -131,6 +131,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Wit.Interop\Tymed.cs" />
+    <Compile Include="Wit.UI\BranchDialog.cs" />
     <Compile Include="Wit.UI\MessageDialog.cs" />
     <Compile Include="WitShellExtension.cs">
       <SubType>Code</SubType>

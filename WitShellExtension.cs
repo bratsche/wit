@@ -3,6 +3,7 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 
 using Wit.Interop;
+using Wit.UI;
 
 using Gtk;
 
@@ -15,6 +16,7 @@ namespace Wit
     [RegisteredBy(RegistryLocation.ClassesRoot, @"Directory\shellex\ContextMenuHandlers\wit")]
     [RegisteredBy(RegistryLocation.ClassesRoot, @"Drive\shellex\ContextMenuHandlers\wit")]
     [RegisteredBy(RegistryLocation.LocalMachine, @"Software\TortoiseOverlays\Normal", "wit")]
+    [RegisteredBy(RegistryLocation.LocalMachine, @"Software\TortoiseOverlays\Unversioned", "wit")]
     public class WitShellExtension : ShellExtension
     {
         public override MenuItem[] MenuItems
@@ -34,7 +36,15 @@ namespace Wit
 
         private static void OnBranchClicked(object o, EventArgs e)
         {
-            ShowMessage("Current branch is " + Git.CurrentBranch);
+            BranchDialog dialog = new BranchDialog(Git.LocalBranches);
+            dialog.ShowAll();
+            dialog.Run();
+            dialog.Hide();
+        }
+
+        private static void OnUpdateClicked(object o, EventArgs e)
+        {
+            ShowMessage("Update clicked");
         }
 
         private static void ShowMessage(string msg)
@@ -50,7 +60,7 @@ namespace Wit
             new MenuItem("Clone Git Repo", 0, new EventHandler(OnCloneRepoClicked)),
             new PopupItem("Git", GitState.InGitDirectory,
                 new MenuItem[] {
-                    new MenuItem("Update", GitState.InGitDirectory),
+                    new MenuItem("Update", GitState.InGitDirectory, new EventHandler(OnUpdateClicked)),
                     new MenuItem("Branch", GitState.InGitDirectory, new EventHandler(OnBranchClicked))
                 })
         };

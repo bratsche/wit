@@ -1,6 +1,6 @@
 ﻿using Gtk;
 
-namespace Wit
+namespace Wit.UI
 {
     public class BaseMessageDialog
     {

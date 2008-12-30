@@ -2,6 +2,7 @@
 using System.Text;
 using System.Diagnostics;
 using System.ComponentModel;
+using System.Collections.Generic;
 
 namespace Wit
 {
@@ -57,20 +58,23 @@ namespace Wit
             {
                 if (current_branch == String.Empty)
                 {
-                    string output = String.Empty;
-                    GitCommand("branch", ref output);
-
-                    string[] branches = output.Split('\n');
-                    foreach (string s in branches)
-                    {
-                        if (s.Contains("*"))
-                        {
-                            current_branch = s.Replace("*", String.Empty).Replace(" ", String.Empty).Replace("\n", String.Empty);
-                        }
-                    }
+                    SetupBranches();
                 }
 
                 return current_branch;
+            }
+        }
+
+        public string[] LocalBranches
+        {
+            get
+            {
+                if (local_branches == null)
+                {
+                    SetupBranches();
+                }
+
+                return local_branches;
             }
         }
 
@@ -128,12 +132,39 @@ namespace Wit
 
             return proc.ExitCode;
         }
+
+        private void SetupBranches()
+        {
+            string output = String.Empty;
+            GitCommand("branch", ref output);
+
+            List<string> branches = new List<string>();
+            string[] lines = output.Split('\n');
+            foreach (string s in lines)
+            {
+                bool is_current = false;
+                if (s.Contains("*"))
+                {
+                    is_current = true;
+                }
+
+                string branch = s.Replace("*", String.Empty).Replace(" ", String.Empty).Replace("\n", String.Empty);
+                if (branch != "" && branch != String.Empty)
+                    branches.Add(branch);
+
+                if (is_current)
+                    current_branch = branch;
+            }
+
+            local_branches = branches.ToArray();
+        }
 #endregion
 
 #region private data
         private string user_name = String.Empty;
         private string email = String.Empty;
         private string current_branch = String.Empty;
+        private string[] local_branches;
 #endregion
     }
 }
